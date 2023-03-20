@@ -3,6 +3,14 @@ var m = localStorage.getItem("m");
 var p = localStorage.getItem("p");
 var t = localStorage.getItem("t");
 
+var guideflag2 = localStorage.getItem("guideflag2");
+
+console.log(guideflag2);
+
+addEventListener("dblclick", () => {easycam.setState(tri)});
+
+ondblclick = () => {};
+
 // DICHIARO LE VARIABILI FUORI DALLA FUNZIONI
 // PERCHE' ABBIANO VISIBILITA' ANCHE NELLE ALTRE FUNZIONI
 let imgEarth;
@@ -10,22 +18,22 @@ let imgSun;
 let imgMoon;
 var imgSky;
 let imgPlanets = [];
-let sunDim = 200;
+let sunDim = 50;
 //let planetOrbWidth = [170, 300, 500, 800, 1050, 1300, 1600, 1900];
 let planetOrbHeight = [
-  sunDim + 57,
-  50 + sunDim + 108,
-  150 + sunDim + 149,
-  180 + sunDim + 227,
-  sunDim + 588,
-  sunDim + 866.5,
-  sunDim + 1166,
-  sunDim + 1366,
+  sunDim + 14,
+  12.5 + sunDim + 27,
+  37.5 + sunDim + 37.25,
+  45 + sunDim + 56.75,
+  sunDim + 147,
+  sunDim + 216.625,
+  sunDim + 291.5,
+  sunDim + 341.5,
 ];
 let planetOrbWidth = planetOrbHeight.map((x) => x * 1.5);
 let planetTilt = [0, 0, -25, 0, 0, 0, 0, 0];
 let planetRotation = [0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04];
-let planetDiameter = [24, 50, 63, 33, 140, 116, 50, 48];
+let planetDiameter = [6, 12.5, 15.75, 8.25, 35, 29, 12.5, 12];
 let bool = false;
 let easycam;
 
@@ -35,7 +43,7 @@ let playIsOff = true;
 let bpm = 20;
 //1= MEASURE, 4=BEAT
 //---------arp1,arp2,lead,chord4,chord3,chord2,chord1,bass--------------------------------------
-let planetRatios = [32, 24, 2, 5, 4, 3, 2, 1];
+let planetRatios = [8, 16, 2, 4, 4, 4, 4, 1];
 
 let chromas = [
   "C",
@@ -155,10 +163,12 @@ let arp1Envelope, arp1Filter, arp1Synth, arp1Loop;
 let arp2Envelope, arp2Filter, arp2Synth, arp2Loop;
 
 //Planets menus
+let tempVol = [];
+let muted = false;
 let tendina = [];
 let slidVol = [];
-let volumes = [-32, -36, -16, -24, -24, -24, -24, -16];
-let lista = ["1", "4", "16", "32"];
+let volumes = [-16, -23, -23, -23, -23, -19, -26, -50];
+let lista = ["1", "2", "3", "4", "5", "8", "16", "24", "32"];
 let refreshed = false;
 let idVol = [
   "instr1",
@@ -192,6 +202,10 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   easycam.setViewport([0, 0, windowWidth, windowHeight]); // adattamento viewport nel caso
   // di resizing per la easycam
+  for (i = 0; i < 8; i++) {
+    tendina[i].position(windowWidth/50 , windowHeight/8 +  i * windowHeight/10);
+    slidVol[i].position(windowWidth/20, (windowHeight/8 + 7 * windowHeight/10) -  i * windowHeight/10);
+  }
 }
 
 function setup() {
@@ -200,11 +214,11 @@ function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   easycam = createEasyCam(); // creazione oggetto easycam con distanza iniziale
   easycam.setState(tri); // stato iniziale prospettico
-  easycam.setDistanceMax(2900);
+  easycam.setDistanceMax(725);
   easycam.setDistanceMin(sunDim+50);
   soundDesign();
 
-  frameRate(30);
+  frameRate(24);
   setAttributes("antialias", true);
   perspective(PI / 2, width / height, 0.1, 15000);
   textureWrap(CLAMP);
@@ -255,44 +269,46 @@ function setup() {
   //RATIO SELECTORS
   for (i = 0; i < 8; i++) {
     tendina[i] = createSelect();
-    tendina[i].position(10 , 60 +  i * windowHeight/10);
+    tendina[i].position(windowWidth/50 , windowHeight/8 +  i * windowHeight/10);
     tendina[i].addClass("style-btn");
-    tendina[i].addClass("hide");
-    tendina[i].addClass("positionMenu");
+    tendina[i].addClass("show");
+    //tendina[i].addClass("positionMenu");
     tendina[i].id(idTend[i]);
-    tendina[i].style("height", "3vw");
-    tendina[i].style("width", "3vw");
+    tendina[i].style("height", "3.8vw");
+    tendina[i].style("width", "3.8vw");
     tendina[i].changed(changeRatio);
     for (let j = 0; j < lista.length; j++) {
       tendina[i].option(lista[j]);
     }
+    tendina[i].selected(planetRatios[i]);
   }
 
   //VOLUME SLIDERS
   for (i = 0; i < 8; i++) {
-    slidVol[i] = createSlider(-100, -16, volumes[i], 1);
+    slidVol[i] = createSlider(-50, -16, volumes[i], 1);
 
-    slidVol[i].position(65, (65 + 7 * windowHeight/10) -  i * windowHeight/10);
+    slidVol[i].position(windowWidth/20, (windowHeight/8 + 7 * windowHeight/10) -  i * windowHeight/10);
     slidVol[i].addClass("slider");
-    slidVol[i].addClass("hide");
+    slidVol[i].addClass("show");
     slidVol[i].addClass("volume");
     slidVol[i].addClass("positionMenu");
     slidVol[i].id(idVol[7 - i]);
     slidVol[i].style("height", "3vw");
     slidVol[i].style("width", "10vw");
+    slidVol[i].style("margin")
     //slidVol[i].style('background-color', '#000000');
 
     slidVol[i].changed(changeVolume);
   }
 
   //MENU
-  menuButton = createButton("Menu");
-  let hiddenMenu = true;
+  menuButton = createButton("Hide");
+  let hiddenMenu = false;
   //menuButton.position(20, 20);
   menuButton.addClass("style-btn");
   menuButton.addClass("positionMenu");
   menuButton.style("height", "3vw");
-  menuButton.style("width", "6vw");
+  menuButton.style("width", "6.5vw");
   menuButton.mouseClicked(function () {
     if (hiddenMenu) {
       hiddenMenu = false;
@@ -314,6 +330,34 @@ function setup() {
         slidVol[i].removeClass("show");
       }
     }
+  });
+
+  //MUTE
+
+  button4 = createButton("Mute");
+  button4.addClass("style-btn");
+  button4.addClass("positionMute");
+  button4.style("height", "3vw");
+  button4.style("width", "6.5vw");
+  button4.mouseClicked(function () {
+    if (!muted) {
+      muted = true;
+      button4.html("Unmute");
+      for (i = 0; i < 8; i++) {
+        tempVol[i] = slidVol[i].value();
+        volumes[i] = -50;
+        slidVol[i].value(-50);
+      }
+    }
+    else{
+      muted = false;
+      button4.html("Mute");
+      for (i = 0; i < 8; i++) {
+        volumes[i] = tempVol[i];
+        slidVol[i].value(tempVol[i]);
+      }
+    }
+    refreshVolumes();
   });
     
     
@@ -344,7 +388,19 @@ function changeRatio() {
     planetRatios[i] = tendina[i].value();
     console.log(planetRatios[i]);
   }
+  
+  Tone.Transport.pause();
+  playIsOff = true;
+  button3.html("Play");
+  bassLoop.cancel();
+  for(let i=0; i<4; i++){
+  chordLoops[i].cancel();
+  }
+  leadLoop.cancel();
+  arp1Loop.cancel();
+  arp2Loop.cancel();
   soundDesign();
+  
 }
 
 function refreshVolumes() {
@@ -361,6 +417,8 @@ function refreshVolumes() {
 }
 
 function changeVolume() {
+  muted = false;
+  button4.html("Mute");
   console.log("Volumes");
   for (i = 0; i < 8; i++) {
     volumes[i] = slidVol[i].value();
@@ -368,6 +426,17 @@ function changeVolume() {
   }
   refreshVolumes();
 }
+
+//Stars variables
+let s = 0;
+let r_s = 2500;
+let x_s, y_s, z_s, c_s = [];
+let n_s = 150;
+let white = [255,255,255];
+let yellow = [255,255,180];
+let cyan = [120,180,255];
+let red = [255,180,180];
+let colors = [white, white, white, yellow, cyan, red];
 
 function draw() {
   //BACKGROUND
@@ -385,12 +454,76 @@ function draw() {
   }
 
   // SKYBOX
-  push();
-  noStroke();
-  texture(environmentSelectedImg);
-  rotateY(frameCount * 0.0005);
-  sphere(4000);
-  pop();
+/*   if(s%20 == 0){
+    x_s = [];
+    y_s = [];
+    z_s = [];  
+    for (i=0; i<50; i++){
+      x_s.push(random(-4000, 4000));
+      y_s.push(random(-4000, 4000));
+      z_s.push(random(-4000, 4000));
+    }
+     /////  push();
+    noStroke();
+    texture(environmentSelectedImg);
+    rotateY(frameCount * 0.0005);
+    sphere(4000);
+    ///////pop(); 
+    s = 0;
+  } */
+
+  if(s==0){
+    s++;
+    x_s = [];
+    y_s = [];
+    z_s = [];
+    c_s = [];
+    for (i=0; i<n_s; i++){
+      x_s[i] = random(-r_s*1.2, r_s*1.2);
+      y_s[i] = random(-r_s, r_s);
+      z_s[i] = random(-r_s, r_s);  
+      c_s[i] = white;
+    }
+  }
+
+  for (i=0; i<n_s; i++){
+    if(i%(n_s/4)==0){
+      x_s.push(random(-r_s*1.2, r_s*1.2));
+      y_s.push(random(-r_s, r_s));
+      z_s.push(random(-r_s, r_s));
+      x_s.shift();
+      y_s.shift();
+      z_s.shift();
+      var col = random([0, 1, 2, 3, 4 ,5]);
+      c_s.push(colors[col]);
+      c_s.shift();
+    }
+    
+    var d_s = Math.sqrt(x_s[i]**2 +  y_s[i]**2 + z_s[i]**2);
+    if(d_s>2900){
+      if(i < n_s/10 || i > (9*n_s)/10){
+        strokeWeight(1);
+        stroke(c_s[i], 80);
+        fill(c_s[i], 80);
+      }
+      else{
+        strokeWeight(random([3, 4]));
+        stroke(c_s[i]);
+        fill(c_s[i]);
+      }
+      
+      
+      point(x_s[i], y_s[i], z_s[i]);
+      if(d_s < 3200){
+        var l = random([12, 13, 14]);
+        strokeWeight(1);
+        line(x_s[i] - l, y_s[i] - l, z_s[i] - l, x_s[i] + l, y_s[i] + l, z_s[i] + l);
+        line(x_s[i] - l, y_s[i] - l, z_s[i] + l, x_s[i] + l, y_s[i] + l, z_s[i] - l);
+        line(x_s[i] - l, y_s[i] + l, z_s[i] + l, x_s[i] + l, y_s[i] - l, z_s[i] - l);
+      }
+    }
+  }
+
 
   //SUN
   noStroke();
@@ -470,14 +603,14 @@ function soundDesign() {
   let arp2NotesIndex = 0;
 
   reverb = new Tone.Reverb({
-    decay: 10,
-    wet: 0.8,
+    decay: 5,
+    wet: 0.7,
   });
 
   pingpong = new Tone.PingPongDelay({
-    delayTime: 0.4,
-    feedback: 0.5,
-    wet: 0.7,
+    delayTime: "2n",
+    feedback: 0.55,
+    wet: 0.6,
   });
 
   //BASSO
@@ -488,8 +621,8 @@ function soundDesign() {
     decay: (planetRatios[7] * 2).toString() + "n",
     sustain: 0,
     release: 0,
-    baseFrequency: "C0",
-    octaves: 5,
+    baseFrequency: "C1",
+    octaves: 4,
     attackCurve: "sine",
   });
 
@@ -536,7 +669,7 @@ function soundDesign() {
     console.log(chordNotes);
   }, planetRatios[7].toString() + "n").start(0);
 
-  //TETRADE CHORDS (ASYNC?)
+  //TETRADE CHORDS
   for (i = 0; i < 4; i++) {
     chordFilters[i] = new Tone.Filter(400, "lowpass");
 
@@ -653,23 +786,23 @@ function soundDesign() {
     leadEnvelope.triggerAttackRelease(planetRatios[2].toString() + "n", time);
   }, planetRatios[2].toString() + "n").start(0);
 
-  //DRY ARPEGGIATOR
+  //ARPEGGIATOR 1
   arp1Filter = new Tone.Filter(400, "lowpass");
 
   arp1Envelope = new Tone.FrequencyEnvelope({
-    attack: (planetRatios[1] * 8).toString() + "n",
-    decay: (planetRatios[1] * 4).toString() + "n",
+    attack: (planetRatios[1] * 30).toString() + "n",
+    decay: (planetRatios[1] * 8).toString() + "n",
     sustain: 0,
     release: 0,
     baseFrequency: "C0",
-    octaves: 7,
+    octaves: 5,
     attackCurve: "sine",
   });
 
   arp1Envelope.connect(arp1Filter.frequency);
 
   arp1Synth = new Tone.Synth({ oscillator: { type: "fmsine" } });
-  arp1Synth.chain(arp1Filter, reverb, Tone.Destination);
+  arp1Synth.chain(arp1Filter, pingpong, Tone.Destination);
   arp1Synth.volume.value = -100;
 
   arp1Loop = new Tone.Loop((time) => {
@@ -686,32 +819,33 @@ function soundDesign() {
     arp1Envelope.triggerAttackRelease(planetRatios[1].toString() + "n", time);
   }, planetRatios[1].toString() + "n").start(0);
 
-  //WET ARPEGGIATOR
+  //ARPEGGIATOR 2
   arp2Filter = new Tone.Filter(400, "lowpass");
 
   arp2Envelope = new Tone.FrequencyEnvelope({
-    attack: (planetRatios[0] * 8).toString() + "n",
+    attack: (planetRatios[0] * 32).toString() + "n",
     decay: (planetRatios[0] * 4).toString() + "n",
     sustain: 0,
     release: 0,
     baseFrequency: "C0",
-    octaves: 7,
+    octaves: 5,
     attackCurve: "sine",
   });
 
   arp2Envelope.connect(arp2Filter.frequency);
 
   arp2Synth = new Tone.Synth({ oscillator: { type: "fmsine" } });
-  arp2Synth.chain(arp2Filter, reverb, Tone.Destination);
+  arp2Synth.chain(arp2Filter, Tone.Destination);
   arp2Synth.volume.value = -100;
 
   arp2Loop = new Tone.Loop((time) => {
     arp2Synth.triggerAttackRelease(
-      chordNotes[arp2NotesIndex][chordNotesIndex] + "4",
+      selectedMode[arp2NotesIndex] + "4",
       planetRatios[0].toString() + "n",
       time
     );
-    if (arp2NotesIndex == 2) {
+    //console.log(time);
+    if (arp2NotesIndex == (selectedMode.length-1)) {
       arp2NotesIndex = 0;
     } else {
       arp2NotesIndex++;
@@ -787,12 +921,165 @@ function getRndInteger(min, max) {
 
 let tri = {
   center: [0, 0, 0],
-  distance: 2400,
+  distance: 600,
   rotation: [1, -0.3, 0, 0],
 };
 
 let bi = {
   center: [0, 0, 0],
-  distance: 2000,
+  distance: 500,
   rotation: [0.2, -0.2, 0, 0],
 };
+
+
+
+// GUIDE TOUR
+
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+      classes: 'shadow-md bg-purple-dark',
+      scrollTo: false
+  }
+});
+
+// step #3
+tour.addStep({
+  id: 'mixer',
+  text: 'mix the sounds here!',
+  attachTo: {
+      element: '#mixer',
+      on: 'right'
+  },
+  classes: '',
+  buttons: [
+      {
+        text: 'NEXT',
+        action: tour.next  
+      },
+      {
+        text: 'EXIT',
+        action: tour.complete,
+        function () {localStorage.setItem("guideflag2", 0)}
+      
+      },
+
+  ]
+});
+
+// step #4
+tour.addStep({
+  id: 'step4',
+  text: 'extracted music parameters from the image',
+  attachTo: {
+      element: '.param2guide',
+      on: 'bottom'
+  },
+  classes: '',
+  buttons: [
+      {
+        text: 'NEXT',
+        action:tour.next
+      },
+      {
+        text: 'EXIT',
+        action: tour.complete,
+        function () {localStorage.setItem("guideflag2", 0)}
+      
+      },
+
+  ]
+});
+
+// step #5
+tour.addStep({
+  id: 'step5',
+  text: 'Click here to listen to sound',
+  attachTo: {
+      element: '.positionPlayStop',
+      on: 'left'
+  },
+  classes: '',
+  buttons: [
+      {
+        text: 'NEXT',
+        action:tour.next
+      },
+      {
+        text: 'EXIT',
+        action: tour.complete,
+        function () {localStorage.setItem("guideflag2", 0)}
+      
+      },
+
+  ]
+});
+
+// step #6
+tour.addStep({
+  id: '2d',
+  text: 'Set 2d environment ',
+  attachTo: {
+      element: '.position2D',
+      on: 'left'
+  },
+  classes: '',
+  buttons: [
+      {
+        text: 'NEXT',
+        action:tour.next
+      },
+      {
+        text: 'EXIT',
+        action: tour.complete,
+        function () {localStorage.setItem("guideflag2", 0)}
+      
+      },
+
+  ]
+});
+
+// step #7
+tour.addStep({
+  id: '3d',
+  text: 'Set 3d environment ',
+  attachTo: {
+      element: '.position3D',
+      on: 'bottom'
+  },
+  classes: '',
+  buttons: [
+    {
+      text: 'NEXT',
+      action:tour.next
+    },
+      {
+        text: 'EXIT',
+        action: tour.complete
+      },
+
+  ]
+});
+
+// step #8
+tour.addStep({
+  id: '3d',
+  text: 'Move in the 3D space using the mouse ',
+  attachTo: {
+      element: '',
+      on: ''
+  },
+  classes: '',
+  buttons: [
+      {
+        text: 'EXIT',
+        action: tour.complete
+      },
+
+  ]
+});
+console.log(guideflag2);
+
+if(guideflag2==1){
+tour.start();
+}

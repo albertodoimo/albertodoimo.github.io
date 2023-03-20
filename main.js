@@ -112,3 +112,57 @@ function ambient(id) {
     localStorage.setItem("environment", selectedAmbient)
     window.location.href = "param.html";
 }
+
+function flag(id) {
+  if (1==localStorage.getItem("guideflag")) {
+    ambient(1);
+    localStorage.setItem("guideflag", 1);
+  } else {
+    ambient(id)
+  }
+}
+
+// GUIDE TOUR
+
+var guideflag
+
+localStorage.setItem("guideflag", 0)
+localStorage.setItem("guideflag2", 0)
+
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+      classes: 'shadow-md bg-purple-dark',
+      scrollTo: true
+  }
+});
+
+
+// step #0
+tour.addStep({
+  id: 'step0',
+  text: 'Select one image to see which music parameters will be extracted. Try different images to change the music mood',
+  attachTo: {
+      element: '.object1',
+      on: 'bottom'
+  },
+  classes: '',
+  buttons: [
+    {
+        text: 'NEXT',
+        action: function () {
+        ambient(1)
+        }
+    },
+      {
+          text: 'EXIT',
+          action: tour.complete
+      },
+
+  ]
+});
+
+document.getElementById("guide").onclick = function () {
+  tour.start();
+  localStorage.setItem("guideflag", 1);
+}
