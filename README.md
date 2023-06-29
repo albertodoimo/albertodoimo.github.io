@@ -1,14 +1,18 @@
-# THE SOUND OF SPACE
+# The Sound Of Space
 
 This project was developed in the context of the "**_Advanced Coding Tools and Methodologies_**" course held at [Politecnico di Milano](https://www.polimi.it/) for the Master's Degree in [Music and Acoustic Engineering](https://suono.polimi.it/). The task was to design and implement a musical web application based on the `HTML`/`CSS`/`JavaScript` framework.
 
-</br>
+The system can be tested by the user in two ways:
 
-The system can be tested by the user in two ways: 
+- Via the <a href="http://albertodoimo.github.io/" target="_blank" rel="noopener noreferrer">Hosted Website</a>.
+- Downloading the whole project from GitHub and running it using VS Code _Live Server_.
+- <a href="https://youtu.be/5OYtXB34ICE" target="_blank" rel="noopener noreferrer">Here</a> there is a demo video of the project.
 
-- <a href="http://albertodoimo.github.io/" target="_blank" rel="noopener noreferrer">Hosted Website</a>
-- Downloading the whole project from GitHub and running it using VS CODE live server
- 
+
+Please note that:
+
+- The system is compatible with **Edge**, **Chrome** and **Opera**. Bugs and poor performances may affect the user experience in other browsers.
+- An Internet connection is necessary to use the website.
 
 ## Table of Contents
 
@@ -28,20 +32,23 @@ The system can be tested by the user in two ways:
     - [Color Quantization: the _Median Cut_ algorithm](#color-quantization-the-median-cut-algorithm)
     - [Palette Building](#palette-building)
   - [Graphical Implementation](#graphical-implementation)
+    - [Program Flow](#program-flow)
+    - [3D Environment](#3d-environment)
   - [Sound Implementation](#sound-implementation)
     - [Musical Style](#musical-style)
-    - [Framework's choice](#frameworks-choice)
-    - [Notes calculation from Image Processing data](#notes-calculation-from-image-processing-data)
+    - [Framework Choice](#framework-choice)
+    - [From the Image Processing to the Music](#from-the-image-processing-to-the-music)
     - [Oscillators, Gain and Effect Nodes](#oscillators-gain-and-effect-nodes)
     - [Loops and Envelopes](#loops-and-envelopes)
     - [Controls](#controls)
     - [Planets and Audio Synchronization](#planets-and-audio-synchronization)
+  - [Group members](#group-members)
 
 </br>
 
 ## _Concept_
 
-The chosen architecture is that of a **generative computer music system**. Starting from an interactive, space-themed environment, the user is supposed to choose a picture from a pre-selected set of images representing stars and galaxies. The application then uses complex image processing algorythms to extract qualitative **_visual data_** from the picture (namely, its _color palette_, its _brightness_, etc.) and converts them to **_musical data_** (that is _mode_, _key_, _progression_, etc.), that are finally used to generate in real-time a **procedurally sequenced musical piece**. The result is achieved by sequencing different instruments and interlacing their _cyclic behaviour_ according to different ratios. The resulting piece will have a **strong ambient flavor**, to reference the kind of soundscape people usually associate to space.
+The chosen architecture is that of a **generative computer music system**. Starting from an interactive, space-themed environment, the user is supposed to choose a picture from a pre-selected set of images representing stars and galaxies. The application then uses complex image processing algorithms to extract qualitative **_visual data_** from the picture (namely, its _color palette_, its _brightness_, etc.) and converts them to **_musical data_** (that is _mode_, _key_, _progression_, etc.), that are finally used to generate in real-time a **procedurally sequenced musical piece**. The result is achieved by sequencing different instruments and interlacing their _cyclic behaviour_ according to different ratios. The resulting piece will have a **strong ambient flavor**, to reference the kind of soundscape people usually associate to space.
 
 It is also possible to receive visual feedback about the musical fabric via the themed **_tridimensional graphical user interface_**, which associates each played instrument to a revolving planet of the Solar System, as if it were a sort of drum machine.
 
@@ -49,7 +56,10 @@ It is also possible to receive visual feedback about the musical fabric via the 
 
 ## Overview
 
-The application is structured in three web pages: the **_environment selection_** one, the that displays the **_extracted parameters_** and finally the **_graphical interface_**. The user can choose to be led through each one of them _step by step_, by selecting the appropriate `GUIDE` button.
+The application is structured in three web pages: the **_environment selection_** one, the one that displays the **_extracted parameters_** and finally the **_graphical interface_**. The user can choose to be led through each one of them _step by step_, by selecting the appropriate `GUIDE` button. The guide automatically leads the user through all the pages, explaining every part and functionality of the application. It was created by means of the <a href="https://shepherdjs.dev/" target="_blank" rel="noopener noreferrer">Shepherd.js</a> library.
+
+  <img src="Images/README/guideButton.png" width="10%" align="right">
+  <img src="Images/README/guideButton2.png" width="10%" align="right">
 
 From a coding perspective, the data relative to the user's selections and the extracted parameters is saved and retrieved across pages by means of the `localStorage` read-only property of the `window` interface. This allows access to a `Storage` object for the `Document`'s origin, enabling the **_stored data_** to be **saved across browser sessions**.
 
@@ -76,7 +86,7 @@ _The algorithms on which the extraction of the musical features from the image i
 - Average **Color** $\longrightarrow$ [_Key_](#key-computation---average-color)
 - Average **Brightness** $\longrightarrow$ [_Mode_](#mode-computation---brightness) (Major/Minor)
 - Chromatic Variety (**Palette Dimension**), **Brightness** and **Lightness** $\longrightarrow$ [_Chord Progression_](#chord-progression-computation---palette-extraction-algorithm)
-- **Lightness** $\longrightarrow$ _Triad/Tetrad_
+- **Lightness** $\longrightarrow$ [_Triad/Tetrad_](#chord-type-computation---lightness)
 
 ---
 
@@ -98,11 +108,11 @@ As the GUI suggests, the user can:
 - Drag the mouse and/or scroll the mousewheel to _move in the 3D space_;
 - Switch from a _tridimensional perspective_ to a _bidimensional_ one (and vice versa).
 
-The musical specifications computed before are shown on the top of the screen. In addition, notice how the user-selected picture is _wrapped around the skybox_ of the tridimensional space.
+The musical specifications computed before are shown on the top of the screen. In addition, to create a more immersive environment the user-selected picture is _wrapped around the skybox_ of the tridimensional space.
 
 </br>
 
-<img src="Images/README/Scriabin-Circle.svg" align="right" width="40%" style="margin: 15px;">
+<img src="Images/README/Scriabin-Circle.svg" align="right" width="30%" style="margin: 15px;">
 
 
 ## Key Computation - _Average Color_
@@ -166,7 +176,7 @@ Delta E is a **metric** that aims at being compatible with the human eye color p
 
 </center>
 
-There are three $\Delta E$ algrithms, and there are quite a few inconsistencies between them. $\mathbf{\Delta E_{2000}}$ (the one employed in the project) **is the most recent, complex and accurate one**.
+There are three $\Delta E$ algorithms, and there are quite a few inconsistencies between them. $\mathbf{\Delta E_{2000}}$ (the one employed in the project) **is the most recent, complex and accurate one**.
 
 </br>
 
@@ -256,7 +266,7 @@ The extracted palette is then ordered by luminance and appended to the HTML docu
 
 ### Image Data Extraction
 
-The image is loaded into a `canvas` element by means of the `.onload` event handler. This allows us to access the image data, via the `gatImageData()` method of the canvas API. The `.onload` function handles all the computation related to the extraction of the picture data.
+The image is loaded into a `canvas` element by means of the `.onload` event handler. This allows us to access the image data, via the `getImageData()` method of the canvas API. The `.onload` function handles all the computation related to the extraction of the picture data.
 
 ```javascript
 img.onload = function() {
@@ -468,7 +478,21 @@ if (token < 50) {
 
 ## Graphical Implementation
 
-In order to generate a 3D environment we relied on `p5.js`, a JavaScript library for _creative coding_. In particular, we focused on its ability to simplify the `WebGL` implementation. When creating the `canvas` in the `setup` function of p5, we declare a third parameter, `WEBGL`, which sets the environment to 3D:
+In order to generate a 3D environment we employed `p5.js`, a JavaScript library for _creative coding_. In particular, we focused on its ability to simplify the `WebGL` implementation. 
+
+### Program Flow
+
+A typical p5.js JavaScript sketch is branched in three main functions: `setup`, `preload` and `draw`.
+
+The `setup()` function is called once when the program starts. It's used to define initial environment properties such as screen size and background color and to load media such as images and fonts as the program starts ([reference](https://p5js.org/reference/#/p5/setup)).
+
+Called directly before `setup()`, the `preload()` function is used to handle asynchronous loading of external files in a blocking way. If a _preload_ function is defined, `setup()` will wait until any load calls within have finished ([reference](https://p5js.org/reference/#/p5/preload)).
+
+Called directly after `setup()`, the `draw()` function continuously executes the lines of code contained inside its block until the program is stopped ([reference](https://p5js.org/reference/#/p5/draw)).
+
+### 3D Environment
+
+When creating the `canvas` in the `setup` function, the parameter `WEBGL` sets the environment to tridimensional:
 
 ```javascript
 function  setup() {
@@ -477,23 +501,23 @@ function  setup() {
 }
 ```
 
-Additionaly, in order to allow the user to control the camera point in the 3D perspective, we employed another library, `p5.EasyCam` which is also declared in the `Setup` function as follows:
+Additionally, in order to enable the user to control the camera in the context of the tridimensional perspective, we relied on another library, i.e. `p5.EasyCam`. The corresponding object is also declared in the `Setup` function:
 
 ```javascript
  easycam = createEasyCam();
  easycam.setState(tri);
 ```
 
-This library offers the possibility to set various parameters for example the minimum and maximum distance from the center of view and some predefined states among witch the user can switch with the perspective buttons of the GUI.
+The object named `tri` is nothing but a pre-declared camera state, which sets automatically the camera settings which were associated to the starting 3D perspective. The library offers a wide choice of customizxable parameters regarding the camera state (for example, the _minimum and maximum distances from the center of view_).
 
-The planets have a dedicated function to which an array of values, one for each planet, is passed in the instantiation of the object. In this function several p5 features are used:
+The planets have a dedicated function which takes an array of values (one for each planet) when instantiating the object. It employs several `p5.js` features:
 
-- The planet is created as polygonal sphere with the `sphere(diameter);` code;
-- The planet is textured by clamping an image, previously loaded in the `preload` function, with the p5 expressions `textureWrap(CLAMP);` and `texture(skin);`
-- The planet rotates around his axis by means of the function `rotateY(frameCount * rotation);`
-- The Earth is the only planet whose rotation axis is tilted with respect to the elliptical plane and this is achieved through the following code:`rotateZ(tilt);`
-- The ellipse is drawn by means of `ellipse(0, 0, orbitWidth*2, orbitHeight*2)`;
-- The planet is tranlsated along his revolution ellipse by the following expression:
+- The planet is created as a polygonal sphere via the `sphere(diameter)` call;
+- The planet is textured by clamping one of the previously loaded images (in the `preload` function), via the p5 function `textureWrap(CLAMP)` and `texture(skin)`;
+- The planet is put in motion around its axis by means of the function `rotateY(frameCount * rotation)`;
+- The Earth is the only planet whose rotation axis is tilted with respect to the elliptical plane. This is achieved through the following call: `rotateZ(tilt)`;
+- The elliptical orbit is drawn by means of `ellipse(0, 0, orbitWidth*2, orbitHeight*2)`;
+- The planet is tranlsated along its orbit by the following expression:
 
   ```javascript
    translate(
@@ -503,30 +527,32 @@ The planets have a dedicated function to which an array of values, one for each 
    );
   ```
 
-  where `movePlanet` is a variable used to control if the planet is moving or not and which therefore can assume the values 0 or 1. Note that the revolutionRate value is linked to the `audioContext currentTime` as to sync the planets with the amplitude envelopes of the synths.
+  where `movePlanet` is a boolean variable employed as a flag, to check if the planet is moving or not. Note that the `revolutionRate` value is linked to the `audioContext` "`currentTime`" in order to sync the planets with the amplitude envelopes of the synths.
 
-The `planet()` function will finally be called one time for each planet inside the `draw()` function of p5.
+The `planet()` function is called one time per planet inside the `draw()` function.
+
+All the graphics are optimized to work with different screen dimensions.
 
 ## Sound Implementation
 
 ### Musical Style
 
-Given the concept of representing the sound through a sort of rhythmic wheel which consists of the planets of the Solar System, we decided to keep the musical style consinstent with the environment and therefore we tried to achieve a space-like flavour for the sound. Ambient music has surely been our greatest influence in this field and in particular the drone-like, slowly-raising synths of the "Blade Runner" soundtrack by the great Vangelis, along with most of Brian Eno's works.
+We decided to keep the musical style consistent with the aesthetic of the environment. Hence, we tried to give a space-like flavour to the sound. Ambient music has surely been our greatest influence in this context. Particularly, the drone-like, slowly-raising synths of the "_Blade Runner_" soundtrack (Vangelis, 1982), along with most of _Brian Eno_'s works.
 
-### Framework's choice
+### Framework Choice
 
-The sound was originally implemented with the library `Tone.js` because of its intuitiveness and its various features, in particular the transport functions to play and pause the loops and the easiness of implementation. Unfortunately, as the project was increasing in complexity during the final stages of work, we discovered that `Tone` is very inefficient and heavy computationally-wise, so we re-implemented the sound using the `AudioContext` environment which did the job very nicely.
+The sound components was originally implemented via the library `Tone.js` because of its intuitiveness and various features. In particular, we were interested in the transport functions to play and pause the loops and their easiness of implementation. Unfortunately, during the final stages of work, as the project was increasing in complexity, we discovered that `Tone.js` is very inefficient from a computational perspective. Thus, we switched to the `AudioContext` environment which, instead, worked perfectly.
 
-### Notes calculation from Image Processing data
+### From the Image Processing to the Music
 
-From the image processing we get the following data:
+The parameter extraction process returns the following encapsulated data:
 
-- Detected key
-- Mode (major or minor)
-- Chord progression
-- Tetrad type
+- Detected key;
+- Mode (major or minor);
+- Chord progression;
+- Chord type.
 
-These informations are processed in order to generate an array of frequecies for each synth/planet. The synth will then cycle through this sequence according to its ratio of playing. The bass notes, for example, are extracted from the selected scale, mode and chord progression as follows:
+These informations are processed in order to generate an array of frequecies for each synth/planet. The synth will then cycle through this sequence according to its playing ratio. The bass notes, for example, are extracted from the selected scale, mode and chord progression as follows:
 
 ```javascript
 let  bassNotes = [];
@@ -536,25 +562,24 @@ for (i = 0; i < selectedProgression.length; i++) {
 }
 ```
 
-For what concerns the the chord notes we applied a **2:1 subsampling starting** from the detected scale. Lead notes (which are played by the Earth) **are generated randomly from the pentatonic scale** of the key and this translates in a semi-generative design. Finally the first arpeggiator cycles through the notes of the whole scale while the second one plays the notes of the chord sequentially.
+Concerning the chord notes, we applied a **2:1 subsampling** starting from the detected scale. Lead notes (which are played by planet Earth) are **generated randomly** from the _pentatonic scale_ in the selected key. This translates to a **_semi-generative design_**.
+
+Finally, the _first arpeggiator_ cycles through the notes of the whole scale, while the _second_ one plays the notes of the chord sequentially.
 
 ### Oscillators, Gain and Effect Nodes
 
-The first step in the creation of sound is the generation of the oscillators: `context.createOscillator().`This occours in the `SoundDesign` function, where all nodes are created and connected.
-Each planet has its own oscillator, in particular, every oscillator is a sine wave exept for the chord planets i.e. Uranus Saturn Jupiter and Mars which are characterized by a square wave. The waveform of the oscillator is set as follows: `osc.type="sine";`
+The first step in the synthesis is the creation of the oscillators: `context.createOscillator().` This happens in the `SoundDesign` function, where all the nodes are created and connected. Each planet has its own oscillator: every oscillator is a _sine wave_, except for the "chord planets", i.e. Uranus, Saturn, Jupiter and Mars, which are characterized by a _square wave_. The waveform of the oscillator is set as follows: `osc.type = "sine"`.
 
-Each oscillator has its volume controlled by a `gainNode` which is instanciated this way:
-`context.createGain()`. In addition to this, a final gain has been created as to control the master volume of the application.
+Each oscillator has its volume controlled by a `gainNode`, which is instantiated the following way: `context.createGain()`. In addition to this, a final gain has been created in order to control the _master volume_.
 
-Moreover some effects are being created:
+Moreover, some effects were created:
 
-- A `convolver` reverb, to which an impulse responce buffer was fed:
-  `convolver = new  ConvolverNode(context,{buffer:impulse})`
-  The impulse buffer is actually being created by the function `impulseResponce(duration, decay)` which basically fills every sample of the buffer with a random value between -1 and 1 scaled by a decreasing exponential which slope is linked to the `duration` and `decay` parameters. The `convolver` also has its `gainNode`;
-- A `delay` which is connected through a feedback loop with its gain (the gain value will control the amount of feedback) `delay = context.createDelay` which time can be set as follows: `delay.delayTime.value=...`;
-- An `high-pass filter` which is used to cut undesired frequencies before the output: `hi_filter= new  BiquadFilterNode(context)`which cutoff frequency can be set by: `hi_filter.frequency.value=...`;
+- A **convolver reverb**, to which an impulse responce buffer was fed:
+  `convolver = new  ConvolverNode(context,{buffer:impulse})`. The impulse buffer is actually being created by the function `impulseResponce(duration, decay)`, which basically fills every sample of the buffer with a random value between -1 and 1 scaled by a decreasing exponential whose slope is linked to the `duration` and `decay` parameters. `convolver` also has its `gainNode`;
+- A **delay**, connected through a feedback loop to its gain (so that _the gain value will control the amount of feedback_): `delay = context.createDelay`. The delay time can be set as follows: `delay.delayTime.value = ...`;
+- A **low-pass filter**, that is used to cut undesired frequencies before the output: `low_filter= new  BiquadFilterNode(context)`which cutoff frequency can be set by: `low_filter.frequency.value=...`;
 
-The connection between the various nodes is reported in the graph below:
+The ***nodes network*** is represented in the graph below:
 
 ```mermaid
 graph LR
@@ -567,12 +592,12 @@ I-->C
 M[arp1Osc]-->N[arp1Gain]-->C
 N-->I
 O[arp2Osc]-->P[arp2Gain]-->C
-C-->Q[hi-pass filter]-->R[context.destination]
+C-->Q[low-pass filter]-->R[context.destination]
 ```
 
 ### Loops and Envelopes
 
-Each planet has its own `play` function which controls the notes to be played and the envelope applied to the gain of the synth. An index cycles thorugh the array of frequencies that will be played every time the function is called. At the same time the `gainNode` gain is linearly shaped to reach the desired volume before going back to 0. In other terms the synth is being shaped by a triangular-shaped envelope.
+Each planet has its own `play` function, which controls the notes to be played and the envelope applied to the gain of the synth. An index cycles thorugh the array of frequencies that will be played every time the function is called. At the same time the `gainNode` gain is linearly shaped to reach the desired volume before going back to 0. In other words, **the synth is being shaped by a triangular-shaped envelope**.
 
 ```javascript
 let  bassNotesIndex = 0;
@@ -590,29 +615,40 @@ function  playBass()
 }
 ```
 
-These function are then scheduled with the respective ratios by the `PlaySound()` function which is called once the play button is pressed:
+These functions are then scheduled with the respective ratios by the `PlaySound()` function, that is called once the play button is pressed:
 
 ```javascript
 bassLoop = setInterval(playBass, msRep/planetRatios[7]);
 ```
 
-Once the stop button is pressed the `stopSound()` function is called, which will clear the scheduled intervals and set the volumes to 0.
+Once the stop button is clicked, the `stopSound()` function is called. It will clear the scheduled intervals and set the volumes to 0.
 
 ### Controls
 
-- The user can set the volume of a synth by adjusting the correspondent slider. Once this is done the `changeVolume()` function is called which adjusts the corresponding value of the array `volumes[]`.
-- The mute button sets all the values of the array `volumes[]` to 0 after saving the values on a temporary array which will be used to restore the volumes once the unmute button is pressed.
-- Finally, in order to change the ratio of playing of a planet we needed to stop the whole sound as to be able to re-schedule the `play` function of that planet without loosing the sync with the others. The `changeRatio()` function therfore sets the new value of the array `planeRatios[]` and calls the `stopSound()` function. The user will then need to hit the play button once again and wait for the planets to sync and start playing again.
+- The user can set the volume of a synth by adjusting the corresponding slider. Once this is done the `changeVolume()` function is called, adjusting the corresponding value of the array `volumes[]`.
+- The mute button sets all the values of the array `volumes[]` to 0, after saving the old values in a temporary array, that will be used to restore the volumes once the unmute button is activated.
+- Finally, in order to change the ratio of playing of a planet, it was necessary to stop the whole sound to be able to re-schedule the `play` function of that planet without loosing sync with respect to the others. Therefore, the `changeRatio()` function sets the new value of the array `planeRatios[]` and calls the `stopSound()` function. The user will then need to hit the play button once again and wait for the planets to sync.
 
 ### Planets and Audio Synchronization
 
-As we already mentioned in the Graphical Implementation section, the planets move synchronously with the audio. In particular the synth will start playing a new note when the corresponding planet passes the closest vertical semiaxis of the ellipse it is tracing. The volume (controlled by the envelope) will reach its maximum when the planet passes the opposite semiaxis. This is achieved in the following way:
-The planets trace their orbit in the exact time interval that schedules the callback of the function `play` for each planet. Here we report the value that controls the translation along the ellipse (the translation code has already been reported in the graphical section):
+As we already mentioned in the [Graphical Implementation](#graphical-implementation) section, the planets move synchronously with the audio. In particular, **the synth will start playing a new note when the corresponding planet crosses the closest vertical semiaxis of the ellipse it is tracing**. The volume (controlled by the envelope) will reach its maximum when the planet passes the opposite semiaxis. This is achieved in the following way:
+the planets trace their orbit in the exact time interval that schedules the callback of the function `play` for each planet. Below, we report the value that controls the translation along the ellipse (the translation code has already been reported in the graphical section):
 
 ```javascript
-revolutionRate = 2*Math.PI*(context.currentTime/(msRep/modifier/1000));
+revolutionRate = 2 * Math.PI * (context.currentTime/(msRep/modifier/1000));
 ```
 
-where `msRep` is a constant that defines the general bpm of the system and `modifier` is the `planetRatio[]` value passed to the `planet()` function.
+where `msRep` is a constant that defines the general BPM of the system and `modifier` is the `planetRatio[]` value passed to the `planet()` function.
 
-At the same time the planets need to be synched with the sound as to avoid phase shifts between motion and sound. This task is performed by the `synch()` function which checks if: `sin(revolutionRate)==0 && cos(revolutionRate)==1`. If the condition is true the planets and the audio are synchronized so the planets can start moving `movePlanet=1;` and the audio can start playing `playSound();` During the time needed for this to happen a loading text is displayed.
+At the same time the planets need to be synced with the sound to avoid phase shifts. This task is performed by the `synch()` function which checks if: `sin(revolutionRate)==0 && cos(revolutionRate)==1`. If the condition is true the planets and the audio are synchronized. Thus, the planets can start moving (`movePlanet = 1`) and the audio can start playing (`playSound()`). During the time needed for this to happen, a loading text is displayed.
+
+<p align="center">
+  <img src="Images/README/loading.png" width="20%" >
+</p>
+
+## Group members
+
+- Enrico Dalla Mora (enrico1.dalla@mail.polimi.it)
+- Alberto Doimo (alberto.doimo@mail.polimi.it)
+- Federico Caroppo (federico.caroppo@mail.polimi.it)
+- Riccardo Iaccarino (riccardo.iaccarino@mail.polimi.it)
